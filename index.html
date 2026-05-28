@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta tag anti-cache agar HP langsung mendeteksi pembaruan kodingan dari GitHub -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Rapor Digital Madrasah - MA NU Darul Falah</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -552,6 +556,22 @@
                         <button type="submit" class="py-2.5 px-6 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition">Simpan Konfigurasi</button>
                     </div>
                 </form>
+
+                <!-- FITUR BARU: PANEL SINKRONISASI DATA LAPTOP & HP -->
+                <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 mt-6">
+                    <h4 class="font-bold text-xs text-amber-900 uppercase flex items-center"><i class="fa-solid fa-cloud-arrow-up text-amber-700 mr-2 text-sm"></i>Sinkronisasi Basis Data (Laptop &leftrightarrow; HP)</h4>
+                    <p class="text-[11px] text-amber-700 mt-0.5 leading-relaxed">Gunakan fitur ini untuk memindahkan seluruh data siswa, mata pelajaran, dan nilai rapor dari Laptop ke HP tanpa perlu mengetik ulang.</p>
+                    <div class="flex flex-wrap gap-2.5 mt-4">
+                        <button type="button" onclick="eksporBasisData()" class="py-2 px-4 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center">
+                            <i class="fa-solid fa-download mr-1.5"></i> Cadangkan Data (Unduh JSON)
+                        </button>
+                        <label class="py-2 px-4 bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow-sm transition cursor-pointer text-center flex items-center">
+                            <i class="fa-solid fa-upload mr-1.5"></i> Pulihkan Data (Pilih File JSON)
+                            <input type="file" id="file-import-db" accept=".json" onchange="imporBasisData(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
             </div>
         </section>
     </main>
@@ -604,12 +624,12 @@
                         <tr>
                             <td class="border border-slate-400 px-3 py-2 text-center font-bold">Beriman & Bertakwa</td>
                             <td id="print-sikap-spiritual-pred" class="border border-slate-400 px-3 py-2 text-center font-bold">-</td>
-                            <td id="print-sikap-spiritual-desc" class="border border-slate-400 px-3 py-2 text-justify">Peserta didik berkembang sesuai harapan dalam aspek keimanan, keteguhan beribadah, dan toleransi beragama di lingkungan madrasah.</td>
+                            <td id="print-sikap-spiritual-desc" class="border border-slate-400 px-3 py-2 text-justify">Peserta didik berkembang sesuai harapan dalam aspek keimanan, keteguhan beribadah, and toleransi beragama di lingkungan madrasah.</td>
                         </tr>
                         <tr>
                             <td class="border border-slate-400 px-3 py-2 text-center font-bold">Gotong Royong & Kemandirian</td>
                             <td id="print-sikap-social-pred" class="border border-slate-400 px-3 py-2 text-center font-bold">-</td>
-                            <td id="print-sikap-social-desc" class="border border-slate-400 px-3 py-2 text-justify">Peserta didik mampu bekerja sama secara kolaboratif, menunjukkan kemandirian dalam penugasan, and bernalar kritis dengan baik.</td>
+                            <td id="print-sikap-social-desc" class="border border-slate-400 px-3 py-2 text-justify">Peserta didik mampu bekerja sama secara kolaboratif, menunjukkan kemandirian dalam penugasan, dan bernalar kritis dengan baik.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -710,7 +730,7 @@
     <script>
         let currentUser = null;
         
-        // DATA USER LOGIN (Username menggunakan nama panggilan guru dengan huruf kecil)
+        // DATA USER LOGIN
         const USERS = [
             { username: 'admin', password: 'rahasianegara123.', name: 'Administrator', role: 'admin' },
             { username: 'beyrul', password: 'dafa123.', name: 'BEYRUL AN\'AM, S.Hum', role: 'guru' },
@@ -959,11 +979,9 @@
             const tbody = document.getElementById('quick-siswa-list');
             tbody.innerHTML = "";
             
-            // Urutkan siswa berdasarkan nama A-Z untuk dasbor
             const sortedStudents = [...DB.students].sort((a, b) => a.nama.localeCompare(b.nama));
 
             sortedStudents.forEach((s) => {
-                // Cari index asli siswa di dalam DB.students agar aksi tombol "Input Nilai" akurat
                 const originalIdx = DB.students.findIndex(x => x.id === s.id);
                 
                 let total = 0, mCount = 0;
@@ -990,7 +1008,6 @@
 
         function openInputNilaiLangsung(idx) {
             switchTab('nilai');
-            // Reset filter ke "SEMUA" agar siswa yang dicari dari dasbor pasti muncul di pilihan dropdown
             document.getElementById('nilai-filter-kelas').value = "SEMUA";
             updateSiswaDropdowns();
             document.getElementById('nilai-select-siswa').value = idx;
@@ -1006,7 +1023,6 @@
             const tableBody = document.getElementById('siswa-table-body');
             tableBody.innerHTML = "";
             
-            // Urutkan data master siswa berdasarkan nama A-Z
             const sortedWithIdx = DB.students.map((s, i) => ({ ...s, originalIdx: i }));
             sortedWithIdx.sort((a, b) => a.nama.localeCompare(b.nama));
 
@@ -1164,18 +1180,14 @@
             s1.innerHTML = '<option value="">-- Pilih Siswa --</option>';
             s2.innerHTML = '<option value="">-- Pilih Siswa --</option>';
 
-            // Gandakan array data siswa dan sertakan index aslinya agar tautan data tidak rusak
             let dataSiswaMurni = DB.students.map((s, originalIdx) => ({ ...s, originalIdx }));
 
-            // Urutkan siswa berdasarkan Nama secara alfabetis (A-Z)
             dataSiswaMurni.sort((a, b) => a.nama.localeCompare(b.nama));
 
             dataSiswaMurni.forEach((s) => {
-                // Filter untuk tab Input Nilai
                 if (filterKelasNilai === 'SEMUA' || s.kelas === filterKelasNilai) {
                     s1.innerHTML += `<option value="${s.originalIdx}">${s.nama} (${s.kelas})</option>`;
                 }
-                // Filter untuk tab Cetak Rapor
                 if (filterKelasRapor === 'SEMUA' || s.kelas === filterKelasRapor) {
                     s2.innerHTML += `<option value="${s.originalIdx}">${s.nama} (${s.kelas})</option>`;
                 }
@@ -1444,6 +1456,45 @@
 
             document.getElementById('print-area').classList.remove('hidden');
             window.print();
+        }
+
+        // FUNGSI UTAMA BARU: EKSPOR & IMPOR DATABASE BIAR SYNC KE HP
+        function eksporBasisData() {
+            const databaseMentah = localStorage.getItem('rdm_df_database');
+            if (!databaseMentah) {
+                alert("Tidak ada basis data aktif yang bisa dicadangkan!");
+                return;
+            }
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(databaseMentah);
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `RDM_DAFA_BACKUP_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            alert("Database berhasil diekspor! Silakan kirim file JSON ini ke HP Anda (via WA atau Email).");
+        }
+
+        function imporBasisData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    
+                    // Validasi sederhana untuk memastikan data tersebut adalah database RDM kita
+                    if (parsedData.students && parsedData.subjects) {
+                        localStorage.setItem('rdm_df_database', JSON.stringify(parsedData));
+                        alert("Basis data berhasil dipulihkan dan disinkronkan! Sistem akan memuat ulang halaman.");
+                        window.location.reload();
+                    } else {
+                        alert("Struktur berkas JSON tidak sesuai. Pastikan file merupakan hasil cadangan dari sistem ini!");
+                    }
+                } catch (error) {
+                    alert("Gagal membaca file JSON. Pastikan file tidak rusak!");
+                }
+            };
+            fileReader.readAsText(event.target.files[0]);
         }
     </script>
 </body>
