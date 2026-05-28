@@ -191,7 +191,7 @@
 
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
-                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-list-check mr-2 text-emerald-600"></i>Daftar Siswa Kelas</h3>
+                    <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-list-check mr-2 text-emerald-600"></i>Daftar Siswa Aktif (Urut Abjad)</h3>
                     <button onclick="loadSampleData()" id="btn-reset-db" class="text-xs font-semibold px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition">
                         <i class="fa-solid fa-database mr-1"></i>Reset DB (Mode Admin)
                     </button>
@@ -265,7 +265,7 @@
                 </div>
 
                 <div class="flex-grow bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-users mr-2 text-emerald-600"></i>Data Master Siswa</h3>
+                    <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fa-solid fa-users mr-2 text-emerald-600"></i>Data Master Siswa (Urut Abjad)</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-100 text-sm text-left">
                             <thead class="bg-slate-50 text-slate-500 font-semibold">
@@ -348,11 +348,20 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 mb-6 gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-file-pen text-emerald-600 mr-2"></i>Input Nilai Akademik (Kurmer)</h2>
-                        <p class="text-xs text-slate-500 mt-1" id="lbl-info-input-nilai">Pilih nama siswa aktif untuk melakukan pengisian nilai.</p>
+                        <p class="text-xs text-slate-500 mt-1" id="lbl-info-input-nilai">Pilih kelas dan nama siswa aktif untuk melakukan pengisian nilai.</p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <div class="w-full sm:w-40">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">Filter Kelas</label>
+                            <select id="nilai-filter-kelas" onchange="updateSiswaDropdowns()" class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm bg-white font-medium">
+                                <option value="SEMUA">-- Semua Kelas --</option>
+                                <option value="E / X - 1">Fase E / X - 1</option>
+                                <option value="F / XI - 1">Fase F / XI - 1</option>
+                                <option value="F / XII - 1">Fase F / XII - 1</option>
+                            </select>
+                        </div>
                         <div class="w-full sm:w-64">
-                            <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">Pilih Siswa</label>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase">Pilih Siswa (Urut A-Z)</label>
                             <select id="nilai-select-siswa" onchange="loadStudentGradeData()" class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm bg-white font-medium">
                                 <option value="">-- Pilih Siswa --</option>
                             </select>
@@ -477,12 +486,22 @@
                 </div>
                 <div>
                     <h3 class="text-xl font-bold text-slate-800">Lembar Cetak Rapor Digital Madrasah</h3>
-                    <p class="text-slate-500 text-xs mt-1">Silakan pilih nama siswa untuk menggenerasikan tampilan cetak resmi.</p>
+                    <p class="text-slate-500 text-xs mt-1">Silakan pilih filter kelas dan nama siswa untuk menggenerasikan tampilan cetak resmi.</p>
                 </div>
-                <div class="max-w-xs mx-auto">
-                    <select id="rapor-select-siswa" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-sm bg-white">
-                        <option value="">-- Pilih Siswa --</option>
-                    </select>
+                <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                    <div class="w-full sm:w-1/3">
+                        <select id="rapor-filter-kelas" onchange="updateSiswaDropdowns()" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-sm bg-white">
+                            <option value="SEMUA">Semua Kelas</option>
+                            <option value="E / X - 1">Fase E / X - 1</option>
+                            <option value="F / XI - 1">Fase F / XI - 1</option>
+                            <option value="F / XII - 1">Fase F / XII - 1</option>
+                        </select>
+                    </div>
+                    <div class="w-full sm:w-2/3">
+                        <select id="rapor-select-siswa" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-sm bg-white">
+                            <option value="">-- Pilih Siswa --</option>
+                        </select>
+                    </div>
                 </div>
                 <button onclick="generatePrintLayout()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition">
                     <i class="fa-solid fa-receipt mr-2"></i>Buka Tampilan Siap Cetak
@@ -590,7 +609,7 @@
                         <tr>
                             <td class="border border-slate-400 px-3 py-2 text-center font-bold">Gotong Royong & Kemandirian</td>
                             <td id="print-sikap-social-pred" class="border border-slate-400 px-3 py-2 text-center font-bold">-</td>
-                            <td id="print-sikap-social-desc" class="border border-slate-400 px-3 py-2 text-justify">Peserta didik mampu bekerja sama secara kolaboratif, menunjukkan kemandirian dalam penugasan, dan bernalar kritis dengan baik.</td>
+                            <td id="print-sikap-social-desc" class="border border-slate-400 px-3 py-2 text-justify">Peserta didik mampu bekerja sama secara kolaboratif, menunjukkan kemandirian dalam penugasan, and bernalar kritis dengan baik.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -749,27 +768,24 @@
         let DB = { students: [], subjects: [] };
 
         window.onload = function() {
-    checkSession();
-    
-    // Tambahkan listener otomatis ini, bosku!
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'rdm_df_database') {
-            // Jika admin update data, akun guru langsung auto-sync database tanpa logout
-            if (sessionStorage.getItem('rdm_active_user')) {
-                DB = JSON.parse(e.newValue);
-                renderDashboardStats();
-                renderQuickSiswa();
-                updateSiswaDropdowns();
-                
-                // Jika sedang buka tab input nilai, muat ulang tabel nilainya
-                const selectSiswa = document.getElementById('nilai-select-siswa');
-                if(selectSiswa && selectSiswa.value !== "") {
-                    loadStudentGradeData();
+            checkSession();
+            
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'rdm_df_database') {
+                    if (sessionStorage.getItem('rdm_active_user')) {
+                        DB = JSON.parse(e.newValue);
+                        renderDashboardStats();
+                        renderQuickSiswa();
+                        updateSiswaDropdowns();
+                        
+                        const selectSiswa = document.getElementById('nilai-select-siswa');
+                        if(selectSiswa && selectSiswa.value !== "") {
+                            loadStudentGradeData();
+                        }
+                    }
                 }
-            }
+            });
         }
-    });
-}
 
         function checkSession() {
             const sessionData = sessionStorage.getItem('rdm_active_user');
@@ -825,7 +841,6 @@
             document.getElementById('active-user-info').innerText = currentUser.name;
             document.getElementById('dashboard-welcome').innerText = `Selamat Datang, ${currentUser.name}`;
 
-            // --- LOGIKA PEMBATASAN HAK AKSES MULTIROLE ---
             if (currentUser.role === 'admin') {
                 document.getElementById('btn-tab-siswa').classList.remove('hidden');
                 document.getElementById('btn-tab-mapel').classList.remove('hidden');
@@ -839,7 +854,7 @@
                 document.getElementById('mob-btn-tab-rapor').classList.remove('hidden');
                 document.getElementById('mob-btn-tab-pengaturan').classList.remove('hidden');
 
-                document.getElementById('lbl-info-input-nilai').innerText = "Pilih nama siswa aktif untuk melakukan pengisian nilai.";
+                document.getElementById('lbl-info-input-nilai').innerText = "Pilih kelas dan nama siswa aktif untuk melakukan pengisian nilai.";
             } else {
                 document.getElementById('btn-tab-siswa').classList.add('hidden');
                 document.getElementById('btn-tab-mapel').classList.add('hidden');
@@ -943,7 +958,14 @@
         function renderQuickSiswa() {
             const tbody = document.getElementById('quick-siswa-list');
             tbody.innerHTML = "";
-            DB.students.forEach((s, idx) => {
+            
+            // Urutkan siswa berdasarkan nama A-Z untuk dasbor
+            const sortedStudents = [...DB.students].sort((a, b) => a.nama.localeCompare(b.nama));
+
+            sortedStudents.forEach((s) => {
+                // Cari index asli siswa di dalam DB.students agar aksi tombol "Input Nilai" akurat
+                const originalIdx = DB.students.findIndex(x => x.id === s.id);
+                
                 let total = 0, mCount = 0;
                 DB.subjects.forEach(m => {
                     const g = s.grades?.[m.id];
@@ -960,7 +982,7 @@
                         <td class="px-6 py-4"><span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-bold">${s.kelas}</span></td>
                         <td class="px-6 py-4 font-bold text-emerald-700">${ratarata}</td>
                         <td class="px-6 py-4 text-right">
-                            <button onclick="openInputNilaiLangsung(${idx})" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-lg border border-emerald-200 transition"><i class="fa-solid fa-file-pen mr-1"></i>Input Nilai</button>
+                            <button onclick="openInputNilaiLangsung(${originalIdx})" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-lg border border-emerald-200 transition"><i class="fa-solid fa-file-pen mr-1"></i>Input Nilai</button>
                         </td>
                     </tr>`;
             });
@@ -968,6 +990,9 @@
 
         function openInputNilaiLangsung(idx) {
             switchTab('nilai');
+            // Reset filter ke "SEMUA" agar siswa yang dicari dari dasbor pasti muncul di pilihan dropdown
+            document.getElementById('nilai-filter-kelas').value = "SEMUA";
+            updateSiswaDropdowns();
             document.getElementById('nilai-select-siswa').value = idx;
             loadStudentGradeData();
         }
@@ -980,7 +1005,12 @@
         function renderSiswa() {
             const tableBody = document.getElementById('siswa-table-body');
             tableBody.innerHTML = "";
-            DB.students.forEach((s, i) => {
+            
+            // Urutkan data master siswa berdasarkan nama A-Z
+            const sortedWithIdx = DB.students.map((s, i) => ({ ...s, originalIdx: i }));
+            sortedWithIdx.sort((a, b) => a.nama.localeCompare(b.nama));
+
+            sortedWithIdx.forEach((s) => {
                 tableBody.innerHTML += `
                     <tr class="hover:bg-slate-50 text-xs text-slate-700">
                         <td class="px-6 py-3.5 font-bold text-slate-900 uppercase">${s.nama}</td>
@@ -988,8 +1018,8 @@
                         <td class="px-6 py-3.5 font-medium">${s.kelas} / ${s.semester.split(" ")[0]}</td>
                         <td class="px-6 py-3.5 font-semibold text-slate-600">${s.walikelas}</td>
                         <td class="px-6 py-3.5 text-right whitespace-nowrap">
-                            <button onclick="actionEditSiswa(${i})" class="text-emerald-600 hover:text-emerald-800 mr-3.5 font-bold"><i class="fa-solid fa-user-gear mr-1"></i>Edit</button>
-                            <button onclick="deleteSiswa(${i})" class="text-rose-600 hover:text-rose-800 font-bold"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="actionEditSiswa(${s.originalIdx})" class="text-emerald-600 hover:text-emerald-800 mr-3.5 font-bold"><i class="fa-solid fa-user-gear mr-1"></i>Edit</button>
+                            <button onclick="deleteSiswa(${s.originalIdx})" class="text-rose-600 hover:text-rose-800 font-bold"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>`;
             });
@@ -1027,6 +1057,8 @@
             }
             saveDB();
             renderSiswa();
+            renderQuickSiswa();
+            updateSiswaDropdowns();
             resetFormSiswa();
         }
 
@@ -1039,6 +1071,7 @@
             document.getElementById('siswa-kelas').value = s.kelas;
             document.getElementById('siswa-semester').value = s.semester;
             document.getElementById('siswa-walikelas').value = s.walikelas;
+            switchTab('siswa');
         }
 
         function deleteSiswa(i) {
@@ -1046,6 +1079,8 @@
                 DB.students.splice(i, 1);
                 saveDB();
                 renderSiswa();
+                renderQuickSiswa();
+                updateSiswaDropdowns();
             }
         }
 
@@ -1123,13 +1158,27 @@
             const s1 = document.getElementById('nilai-select-siswa');
             const s2 = document.getElementById('rapor-select-siswa');
             
+            const filterKelasNilai = document.getElementById('nilai-filter-kelas') ? document.getElementById('nilai-filter-kelas').value : 'SEMUA';
+            const filterKelasRapor = document.getElementById('rapor-filter-kelas') ? document.getElementById('rapor-filter-kelas').value : 'SEMUA';
+            
             s1.innerHTML = '<option value="">-- Pilih Siswa --</option>';
             s2.innerHTML = '<option value="">-- Pilih Siswa --</option>';
 
-            DB.students.forEach((s, idx) => {
-                const opt = `<option value="${idx}">${s.nama} (${s.kelas})</option>`;
-                s1.innerHTML += opt;
-                s2.innerHTML += opt;
+            // Gandakan array data siswa dan sertakan index aslinya agar tautan data tidak rusak
+            let dataSiswaMurni = DB.students.map((s, originalIdx) => ({ ...s, originalIdx }));
+
+            // Urutkan siswa berdasarkan Nama secara alfabetis (A-Z)
+            dataSiswaMurni.sort((a, b) => a.nama.localeCompare(b.nama));
+
+            dataSiswaMurni.forEach((s) => {
+                // Filter untuk tab Input Nilai
+                if (filterKelasNilai === 'SEMUA' || s.kelas === filterKelasNilai) {
+                    s1.innerHTML += `<option value="${s.originalIdx}">${s.nama} (${s.kelas})</option>`;
+                }
+                // Filter untuk tab Cetak Rapor
+                if (filterKelasRapor === 'SEMUA' || s.kelas === filterKelasRapor) {
+                    s2.innerHTML += `<option value="${s.originalIdx}">${s.nama} (${s.kelas})</option>`;
+                }
             });
         }
 
@@ -1189,7 +1238,6 @@
             document.getElementById(`subtab-btn-${sub}`).classList.add('border-b-2', 'border-emerald-600', 'text-emerald-700');
         }
 
-        // --- FUNGSI UTAMA UNTUK FILTER MAPEL BERDASARKAN GURU LOGIN ---
         function renderMapelGradeTable(student) {
             const tbody = document.getElementById('mapel-grade-tbody');
             tbody.innerHTML = "";
@@ -1200,10 +1248,9 @@
             document.getElementById('th-bobot-praktik').innerText = `(${p}%)`;
             document.getElementById('th-bobot-asas').innerText = `(${a}%)`;
 
-            // Filter: Jika bukan admin, hanya ambil mapel yang nama gurunya mengandung substring dari nama user yang login
             let filteredSubjects = DB.subjects;
             if (currentUser.role !== 'admin') {
-                const loggedInName = currentUser.name.toLowerCase().split(",")[0].trim(); // Ambil nama depan/utama saja
+                const loggedInName = currentUser.name.toLowerCase().split(",")[0].trim();
                 filteredSubjects = DB.subjects.filter(m => 
                     m.guru && m.guru.toLowerCase().includes(loggedInName)
                 );
